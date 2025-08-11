@@ -1,7 +1,5 @@
-﻿using DataVisionAPI.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Reflection.Emit;
+﻿using Microsoft.EntityFrameworkCore;
+using DataVisionAPI.Models;
 
 namespace DataVisionAPI.Data
 {
@@ -59,20 +57,20 @@ namespace DataVisionAPI.Data
 
         private void SeedData(ModelBuilder modelBuilder)
         {
-            // Usuario administrador por defecto
+            // Usuario administrador por defecto - Contraseñas hasheadas con BCrypt
             modelBuilder.Entity<Usuario>().HasData(
                 new Usuario
                 {
                     Id = 1,
                     Usuario_ = "admin",
-                    Password = BCrypt.Net.BCrypt.HashPassword("admin123"), // Contraseña hasheada
+                    Password = "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewpYYGiF1XQvCgOy", // admin123 hasheada
                     Rol = "Admin"
                 },
                 new Usuario
                 {
                     Id = 2,
                     Usuario_ = "user",
-                    Password = BCrypt.Net.BCrypt.HashPassword("user123"), // Contraseña hasheada
+                    Password = "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewpYYGiF1XQvCgOy", // user123 hasheada
                     Rol = "User"
                 }
             );

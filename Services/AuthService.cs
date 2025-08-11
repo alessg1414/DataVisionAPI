@@ -1,22 +1,19 @@
-﻿
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using DataVisionAPI.Data;
 using DataVisionAPI.Models.DTOs;
 
 namespace DataVisionAPI.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUserService _userService;
         private readonly IConfiguration _configuration;
 
-        public AuthService(ApplicationDbContext context, IConfiguration configuration)
+        public AuthService(IUserService userService, IConfiguration configuration)
         {
-            _context = context;
+            _userService = userService;
             _configuration = configuration;
         }
 
@@ -24,9 +21,8 @@ namespace DataVisionAPI.Services
         {
             try
             {
-                // Buscar usuario en la base de datos
-                var usuario = await _context.Usuarios
-                    .FirstOrDefaultAsync(u => u.Usuario_ == loginDto.Usuario);
+                // Buscar usuario usando el servicio
+                var usuario = await _userService.GetUserByUsernameAsync(loginDto.Usuario);
 
                 if (usuario == null)
                 {
@@ -37,8 +33,9 @@ namespace DataVisionAPI.Services
                     };
                 }
 
-                // Verificar contraseña
-                if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, usuario.Password))
+                // Verificar contraseña usando el servicio de hash seguro
+                var isValidPassword = await _userService.ValidatePasswordAsync(loginDto.Password, usuario.Password);
+                if (!isValidPassword)
                 {
                     return new AuthResponseDto
                     {
